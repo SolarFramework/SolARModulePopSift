@@ -1,0 +1,2 @@
+popsift|1.0.0-rc3|popsift|thirdParties@github|https://github.com/SolarFramework/binaries/releases/download|shared
+

@@ -57,6 +57,7 @@ public:
     ///@brief SolARDescriptorsExtractorFromImagePopSift destructor;
     ~SolARDescriptorsExtractorFromImagePopSift();
 
+    org::bcom::xpcf::XPCFErrorCode onConfigured() override final;
 
     ///
     /// @brief getType
@@ -77,6 +78,29 @@ public:
 
 private:
     PopSift* m_popSift;
+    popsift::Config config;
+
+    std::string m_mode = "PopSift";   // "OpenCV", "VLFeat" also possible.
+
+    std::string m_imageMode = "Float"; // Could be "Unsigned CHar"
+    int m_nbOctaves = 0;                // Number of octaves
+    int m_nbLevelPerOctave = 0;     // Number of levels per octave
+    float m_sigma = 0.0f;                  // Initial Sigma value
+    float m_threshold = 0.0f;     // Contrast min threshold
+    float m_edgeLimit = 0.0f;      // On-edge limit, Max ratio of Hessian eigenvalues
+    float m_downsampling = 0.0f;   // Downscale width and height of input by 2^N, Use original image, or perform an upscale if == -1
+    float m_initialBlur = 0.0f;    // Assume initial blur, subtract when blurring first time
+
+    bool m_rootSift = true;         // True, use RootSift(The L1-inspired norm, gives better matching results), otherwise classic (The L2-inspired norm, all descriptors on a hypersphere)
+
+    int m_numScales = 3; // Scales per octave
+    float m_edgeThreshold = 10.0f; // Max ratio of Hessian eigenvalues
+    float m_peakThreshold = 0.005f; // Min contrast
+    float m_relativePeakThreshold = 0.01f; // Min contrast (relative to variance median)
+
+    std::size_t _gridSize = 4;
+    uint32_t m_maxTotalKeypoints = 10000;
+
 };
 
 }

@@ -1,0 +1,1 @@
+popsift|1.0.0-rc3|popsift|conan-solar@conan|conan-solar|default
