@@ -45,15 +45,22 @@ SolARDescriptorsExtractorFromImagePopSift::SolARDescriptorsExtractorFromImagePop
     declareProperty("edgeLimit",m_edgeLimit);
     declareProperty("downsampling",m_downsampling);
     declareProperty("initialBlur",m_initialBlur);
+    declareProperty("maxTotalKeypoints",m_maxTotalKeypoints);
 
+    m_popSift = NULL;
 
 
     LOG_DEBUG(" SolARDescriptorsExtractorFromImagePopSift constructor");
 }
 
+SolARDescriptorsExtractorFromImagePopSift::~SolARDescriptorsExtractorFromImagePopSift(){
+    m_popSift->uninit();
+    delete m_popSift;
+}
+
 xpcf::XPCFErrorCode SolARDescriptorsExtractorFromImagePopSift::onConfigured()
 {
-    LOG_DEBUG(" SolARKeyframeRetrieverFBOW onConfigured");
+    LOG_INFO(" SolARDescriptorsExtractorFromImagePopSift onConfigured");
 
     popsift::cuda::device_prop_t deviceInfo;
     deviceInfo.set(0, true);
@@ -96,6 +103,9 @@ xpcf::XPCFErrorCode SolARDescriptorsExtractorFromImagePopSift::onConfigured()
 #else
     config.setLogMode(popsift::Config::LogMode::None);
 #endif
+    LOG_INFO("SolARDescriptorsExtractorFromImagePopSift Create popSift object");
+    if (m_popSift != NULL)
+        delete m_popSift;
 
     if (m_imageMode=="Float")
         m_popSift = new PopSift( config,
@@ -112,19 +122,15 @@ xpcf::XPCFErrorCode SolARDescriptorsExtractorFromImagePopSift::onConfigured()
                                  popsift::Config::ExtractingMode,
                                  PopSift::ByteImages );
     }
+    return xpcf::XPCFErrorCode::_SUCCESS;
 }
-
-SolARDescriptorsExtractorFromImagePopSift::~SolARDescriptorsExtractorFromImagePopSift(){
-    delete m_popSift;
-}
-
-
 
 FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
                            const SRef<datastructure::Image> image,
                            std::vector<datastructure::Keypoint> & keypoints,
                            SRef<SolAR::datastructure::DescriptorBuffer> & descriptors ) {
 
+    LOG_DEBUG("SolARDescriptorsExtractorFromImagePopSift::extract Begin");
     if (image->getDataType() == Image::DataType::TYPE_32U  && m_imageMode != "Float")
     {
         LOG_ERROR("Image format on 32 bits per component, imageMode of PopSift Descriptor extractor should be set to Float");
@@ -136,22 +142,29 @@ FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
         return FrameworkReturnCode::_ERROR_;
     }
 
-    std::unique_ptr<SiftJob> job(m_popSift->enqueue(image->getWidth(), image->getHeight(), (unsigned char*)image->data()));
-    std::unique_ptr<popsift::FeaturesHost> popFeatures(job->getHost());
+    PopSift::AllocTest allocTestError = m_popSift->testTextureFit(image->getWidth(), image->getHeight());
+    if (allocTestError!=PopSift::AllocTest::Ok)
+        LOG_ERROR("{}",m_popSift->testTextureFitErrorString(allocTestError,image->getWidth(), image->getHeight()));
 
-    int id=0;
+    SiftJob* job;
+    if (m_imageMode == "Unsigned Char")
+        job = m_popSift->enqueue(image->getWidth(), image->getHeight(), (unsigned char*)image->data());
+    else if (m_imageMode == "Float")
+        job = m_popSift->enqueue(image->getWidth(), image->getHeight(), (float*)image->data());
+    else
+        return FrameworkReturnCode::_ERROR_;
 
+    popsift::FeaturesHost* popFeatures = job->getHost();
+
+      int id=0;
     for(const auto& popFeat: *popFeatures)
     {
         for(int orientationIndex = 0; orientationIndex < popFeat.num_ori; ++orientationIndex)
         {
-          const popsift::Descriptor* popDesc = popFeat.desc[orientationIndex];
-          uint32_t posx = (uint32_t)image->getWidth()*popFeat.xpos;
-          uint32_t posy = (uint32_t)image->getHeight()*popFeat.ypos;
           Keypoint kp;
           kp.init(id++,
-                  posx,
-                  posy,
+                  popFeat.xpos,
+                  popFeat.ypos,
                   0.0f,  //(float)image->data()[pixelPos],
                   0.0f, //(float)image->data()[pixelPos+nbCompPerPixel],
                   0.0f, //(float)image->data()[pixelPos+(2*nbCompPerPixel)],
@@ -162,6 +175,8 @@ FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
         }
     }
     descriptors.reset( new DescriptorBuffer((unsigned char*)popFeatures->getDescriptors(), DescriptorType::SIFT, DescriptorDataType::TYPE_32F, 128, popFeatures->getDescriptorCount())) ;
+
+    LOG_DEBUG("{} keypoints were detected by PopSift", id-1);
 
     return FrameworkReturnCode::_SUCCESS;
 }
