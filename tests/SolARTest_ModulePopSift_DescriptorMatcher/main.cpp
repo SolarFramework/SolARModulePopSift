@@ -17,7 +17,9 @@
 #include "xpcf/xpcf.h"
 
 #include "api/image/IImageLoader.h"
+#include "api/image/IImageConvertor.h"
 #include "api/features/IDescriptorsExtractorFromImage.h"
+#include "api/features/IImageMatcher.h"
 #include "api/display/IImageViewer.h"
 #include "api/display/IMatchesOverlay.h"
 #include "api/features/IDescriptorMatcher.h"
@@ -27,6 +29,7 @@
 #include <boost/log/core.hpp>
 #include <string>
 #include <vector>
+#include <chrono>
 
 using namespace SolAR;
 using namespace SolAR::datastructure;
@@ -58,7 +61,11 @@ int main()
         SRef<image::IImageLoader> imageLoaderImage1 = xpcfComponentManager->resolve<image::IImageLoader>("image1");
         SRef<image::IImageLoader> imageLoaderImage2 = xpcfComponentManager->resolve<image::IImageLoader>("image2");
 
+        SRef<image::IImageConvertor> imageConvertor = xpcfComponentManager->resolve<image::IImageConvertor>();
+
         SRef<features::IDescriptorsExtractorFromImage> extractor = xpcfComponentManager->resolve<features::IDescriptorsExtractorFromImage>();
+
+        SRef<features::IImageMatcher> imageMatcher = xpcfComponentManager->resolve<features::IImageMatcher>();
 
         SRef<features::IDescriptorMatcher> matcher = xpcfComponentManager->resolve<features::IDescriptorMatcher>();
 
@@ -66,20 +73,22 @@ int main()
 
         SRef<display::IImageViewer> viewer = xpcfComponentManager->resolve<display::IImageViewer>();
 
+        SRef<display::IImageViewer> viewer2 = xpcfComponentManager->resolve<display::IImageViewer>("imageMatcher");
+
         if (!imageLoaderImage1  || !imageLoaderImage2 || !extractor || !matcher || !overlay || !viewer )
         {
             LOG_ERROR("One or more component creations have failed");
             return -1;
         }
 
-        SRef<Image>                     image1;
-        SRef<Image>                     image2;
-        std::vector<Keypoint>           keypoints1;
-        std::vector<Keypoint>           keypoints2;
-        SRef<DescriptorBuffer>          descriptors1;
-        SRef<DescriptorBuffer>          descriptors2;
-        std::vector<DescriptorMatch>    matches;
-        SRef<Image>                     viewerImage;
+        SRef<Image>                     image1, greyImage1;
+        SRef<Image>                     image2, greyImage2;
+        std::vector<Keypoint>           keypoints1, keypoints1ImageMatcher;
+        std::vector<Keypoint>           keypoints2, keypoints2ImageMatcher;
+        SRef<DescriptorBuffer>          descriptors1, descriptors1ImageMatcher;
+        SRef<DescriptorBuffer>          descriptors2, descriptors2ImageMatcher;
+        std::vector<DescriptorMatch>    matches, matchesImageMatcher;
+        SRef<Image>                     viewerImage, viewerImageMatcher;
 
      // Start
         // Get the first image (the path of this image is defined in the conf_DetectorMatcher.xml)
@@ -88,6 +97,7 @@ int main()
             LOG_WARNING("First image {} cannot be loaded", imageLoaderImage1->bindTo<xpcf::IConfigurable>()->getProperty("filePath")->getStringValue());
             return 0;
         }
+        imageConvertor->convert(image1, greyImage1, SolAR::datastructure::Image::ImageLayout::LAYOUT_GREY);
 
         // Get the second image (the path of this image is defined in the conf_DetectorMatcher.xml)
         if (imageLoaderImage2->getImage(image2) != FrameworkReturnCode::_SUCCESS)
@@ -95,25 +105,39 @@ int main()
             LOG_WARNING("Second image {} cannot be loaded", imageLoaderImage2->bindTo<xpcf::IConfigurable>()->getProperty("filePath")->getStringValue());
             return 0;
         }
+        imageConvertor->convert(image2, greyImage2, SolAR::datastructure::Image::ImageLayout::LAYOUT_GREY);
 
-        // SIFT
+        std::chrono::time_point<std::chrono::system_clock> startPopSift, endPopSift;
+        startPopSift = std::chrono::system_clock::now();
+        // POPSIFT
         // --------
         // Extract the SIFT keypoints and descriptors from the first image
-        extractor->extract(image1, keypoints1, descriptors1);
+        extractor->extract(greyImage1, keypoints1, descriptors1);
 
         // Extract the SIFT keypoints and descriptors from from the first image
-        extractor->extract(image2, keypoints2, descriptors2);
+        extractor->extract(greyImage2, keypoints2, descriptors2);
+
+        endPopSift = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds_PopSift = endPopSift - startPopSift;
+
+        LOG_INFO("Time used by PopSift to detect and extract features: {}ms", elapsed_seconds_PopSift.count() * 500.0f);
 
         // Compute the matches between the keypoints of the first image and the keypoints of the second image
         matcher->match(descriptors1, descriptors2, matches);
-
+        LOG_INFO("{} matches found", matches.size());
         // Draw the matches in a dedicated image
         overlay->draw(image1, image2, viewerImage, keypoints1, keypoints2, matches);
+
+
+        //imageMatcher->match(greyImage1, greyImage2, keypoints1ImageMatcher, keypoints2ImageMatcher, descriptors1ImageMatcher, descriptors2ImageMatcher, matchesImageMatcher);
+        // Draw the matches in a dedicated image
+        //overlay->draw(image1, image2, viewerImageMatcher, keypoints1ImageMatcher, keypoints2ImageMatcher, matchesImageMatcher);
+
 
         while (true)
         {
             // Display the image with matches in a viewer. If escape key is pressed, exit the loop.
-            if (viewer->display(viewerImage) == FrameworkReturnCode::_STOP )
+            if (viewer->display(viewerImage) == FrameworkReturnCode::_STOP /*|| viewer2->display(viewerImageMatcher) == FrameworkReturnCode::_STOP*/ )
             {
                 LOG_INFO("End of DescriptorMatcherPopSiftTest");
                 break;

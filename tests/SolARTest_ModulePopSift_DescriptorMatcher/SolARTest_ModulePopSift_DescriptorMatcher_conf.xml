@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <xpcf-registry autoAlias="true">
-
     <module uuid="4a43732c-a1b2-11eb-bcbc-0242ac130002" name="SolARModulePopSift" description="SolARModulePopSift" path="$XPCF_MODULE_ROOT/SolARBuild/SolARModulePopSift/0.9.3/lib/x86_64/shared">
         <component uuid="7fb2aace-a1b1-11eb-bcbc-0242ac130002" name="SolARDescritorsExtractorFromImagePopSift" description="SolARDescritorsExtractorFromImagePopSift">
             <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
             <interface uuid="c0e49ff1-0696-4fe6-85a8-9b2c1e155d2e" name="IDescriptorsExtractorFromImage" description="IDescriptorsExtractorFromImage"/>
+        </component>
+        <component uuid="3baab95a-ad25-11eb-8529-0242ac130003" name="SolARImageMatcherPopSift" description="SolARImageMatcherPopSift">
+            <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
+            <interface uuid="157ec340-0682-4e6c-bf69-e4d95fa760d3" name="IImageMatcher" description="IImageMatcher"/>
         </component>
     </module>
     <module uuid="15e1990b-86b2-445c-8194-0cbe80ede970" name="SolARModuleOpenCV" description="SolARModuleOpenCV" path="$XPCF_MODULE_ROOT/SolARBuild/SolARModuleOpenCV/0.9.3/lib/x86_64/shared">
         <component uuid="e42d6526-9eb1-4f8a-bb68-53e06f09609c" name="SolARImageLoaderOpencv" description="SolARImageLoaderOpencv">
                 <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
                 <interface uuid="6FCDAA8D-6EA9-4C3F-97B0-46CD11B67A9B" name="IImageLoader" description="IImageLoader"/>
+        </component>
+        <component uuid="fd7fb607-144f-418c-bcf2-f7cf71532c22" name="SolARImageConvertorOpencv" description="SolARImageConvertorOpencv">
+                <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
+                <interface uuid="9c982719-6cb4-4831-aa88-9e01afacbd16" name="IImageConvertor" description="IImageLoader"/>
         </component>
         <component uuid="7823dac8-1597-41cf-bdef-59aa22f3d40a" name="SolARDescriptorMatcherKNNOpencv" description="SolARDescriptorMatcherKNNOpencv">
                 <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
@@ -30,26 +37,41 @@
         <bindings>
             <bind interface="IImageLoader" to="SolARImageLoaderOpencv" name="image1" properties="image1_prop"/>
             <bind interface="IImageLoader" to="SolARImageLoaderOpencv" name="image2" properties="image2_prop"/>
+            <bind interface="IImageViewer" to="SolARImageViewerOpencv" name="default" properties="default"/>
+            <bind interface="IImageViewer" to="SolARImageViewerOpencv" name="imageMatcher" properties="imageMatcher"/>
         </bindings>
     </factory>
 	
     <properties>
         <configure component="SolARImageLoaderOpencv" name="image1_prop">
-            <property name="filePath" type="string" value="../../data/Image1.png"/>
+            <property name="filePath" type="string" value="../../data/ImageA.jpg"/>
         </configure>
         <configure component="SolARImageLoaderOpencv" name="image2_prop">
-            <property name="filePath" type="string" value="../../data/Image2.png"/>
+            <property name="filePath" type="string" value="../../data/ImageB.jpg"/>
         </configure>
         <configure component="SolARDescritorsExtractorFromImagePopSift">
             <property name="mode" type="string" value="PopSift"/>
-            <property name="imageMode" type="string" value="Float"/>
-            <property name="nbOctaves" type="integer" value="-1"/>
-            <property name="nbLevelPerOctave" type="integer" value="-1"/>
+            <property name="imageMode" type="string" value="Unsigned Char"/>
+            <property name="nbOctaves" type="integer" value="3"/>
+            <property name="nbLevelPerOctave" type="integer" value="3"/>
             <property name="sigma" type="float" value="1.0"/>
-            <property name="threshold" type="float" value="1.0"/>
-            <property name="edgeLimit" type="float" value="1.0"/>
+            <property name="threshold" type="float" value="0.005"/>
+            <property name="edgeLimit" type="float" value="10.0"/>
             <property name="downsampling" type="float" value="1.0"/>
             <property name="initialBlur" type="float" value="-1.0"/>
+            <property name="maxTotalKeypoints" type="uint" value="10000"/>
+        </configure>
+        <configure component="SolARImageMatcherPopSift">
+            <property name="mode" type="string" value="PopSift"/>
+            <property name="imageMode" type="string" value="Unsigned Char"/>
+            <property name="nbOctaves" type="integer" value="3"/>
+            <property name="nbLevelPerOctave" type="integer" value="3"/>
+            <property name="sigma" type="float" value="1.0"/>
+            <property name="threshold" type="float" value="0.005"/>
+            <property name="edgeLimit" type="float" value="10.0"/>
+            <property name="downsampling" type="float" value="1.0"/>
+            <property name="initialBlur" type="float" value="-1.0"/>
+            <property name="maxTotalKeypoints" type="uint" value="10000"/>
         </configure>
         <configure component="SolARMatchesOverlayOpencv">
             <property name="thickness" type="uint" value="1"/>
@@ -59,10 +81,16 @@
                 <value>0</value>
                 <value>255</value>
             </property>
-            <property name="maxMatches" type="uint" value="-1"/>
+            <property name="maxMatches" type="int" value="-1"/>
         </configure>
-        <configure component="SolARImageViewerOpencv">
-            <property name="title" type="string" value="Matches SIFT CUDA (press esc key to exit)"/>
+        <configure component="SolARImageViewerOpencv" name="default">
+            <property name="title" type="string" value="Matches PopSift (press esc key to exit)"/>
+            <property name="exitKey" type="int" value="27"/>
+            <property name="width" type="int" value="0"/>
+            <property name="height" type="int" value="0"/>
+        </configure>
+        <configure component="SolARImageViewerOpencv" name="imageMatcher">
+            <property name="title" type="string" value="Matches PopSift with ImageMatcher (press esc key to exit)"/>
             <property name="exitKey" type="int" value="27"/>
             <property name="width" type="int" value="0"/>
             <property name="height" type="int" value="0"/>
