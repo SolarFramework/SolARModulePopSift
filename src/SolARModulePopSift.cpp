@@ -15,6 +15,7 @@
 
 #include "xpcf/module/ModuleFactory.h"
 #include "SolARDescriptorsExtractorFromImagePopSift.h"
+#include "SolARImageMatcherPopSift.h"
 
 
 namespace xpcf=org::bcom::xpcf;
@@ -30,10 +31,16 @@ extern "C" XPCF_MODULEHOOKS_API xpcf::XPCFErrorCode XPCF_getComponent(const boos
 
         errCode =  xpcf::tryCreateComponent<SolAR::MODULES::POPSIFT::SolARDescriptorsExtractorFromImagePopSift>(componentUUID,interfaceRef);
      }
+     if (errCode != xpcf::XPCFErrorCode::_SUCCESS)
+     {
+
+        errCode =  xpcf::tryCreateComponent<SolAR::MODULES::POPSIFT::SolARImageMatcherPopSift>(componentUUID,interfaceRef);
+     }
 
     return errCode;
 }
 
 XPCF_BEGIN_COMPONENTS_DECLARATION
 XPCF_ADD_COMPONENT(SolAR::MODULES::POPSIFT::SolARDescriptorsExtractorFromImagePopSift)
+XPCF_ADD_COMPONENT(SolAR::MODULES::POPSIFT::SolARImageMatcherPopSift)
 XPCF_END_COMPONENTS_DECLARATION

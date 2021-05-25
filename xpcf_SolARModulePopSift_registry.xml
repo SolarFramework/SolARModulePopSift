@@ -5,5 +5,9 @@
             <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
             <interface uuid="c0e49ff1-0696-4fe6-85a8-9b2c1e155d2e" name="IDescriptorsExtractorFromImage" description="IDescriptorsExtractorFromImage"/>
         </component>
+		<component uuid="3baab95a-ad25-11eb-8529-0242ac130003" name="SolARImageMatcherPopSift" description="SolARImageMatcherPopSift">
+            <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
+            <interface uuid="157ec340-0682-4e6c-bf69-e4d95fa760d3" name="IImageMatcher" description="IImageMatcher"/>
+        </component>
     </module>    
 </xpcf-registry>

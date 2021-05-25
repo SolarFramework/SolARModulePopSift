@@ -18,7 +18,7 @@
 #define SOLAR_POPSIFT_API_H
 
 #if _WIN32
-#ifdef SolARModulePOPSIFT_API_DLLEXPORT
+#ifdef SolARModulePopSift_API_DLLEXPORT
 #define SOLARMODULEPOPSIFT_EXPORT_API __declspec(dllexport)
 #else //SOLARMODULEPOPSIFT_EXPORT_API
 #define SOLARMODULEPOPSIFT_EXPORT_API __declspec(dllimport)
