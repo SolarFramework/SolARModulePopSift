@@ -44,10 +44,10 @@
 	
     <properties>
         <configure component="SolARImageLoaderOpencv" name="image1_prop">
-            <property name="filePath" type="string" value="../../data/Image1.png"/>
+            <property name="filePath" type="string" value="../../data/ImageA.jpg"/>
         </configure>
         <configure component="SolARImageLoaderOpencv" name="image2_prop">
-            <property name="filePath" type="string" value="../../data/Image2.png"/>
+            <property name="filePath" type="string" value="../../data/ImageB.jpg"/>
         </configure>
         <configure component="SolARDescritorsExtractorFromImagePopSift">
             <property name="mode" type="string" value="PopSift"/>

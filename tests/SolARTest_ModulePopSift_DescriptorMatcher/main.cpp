@@ -121,9 +121,12 @@ int main()
         std::chrono::duration<double> elapsed_seconds_PopSift = endPopSift - startPopSift;
 
         LOG_INFO("Time used by PopSift to detect and extract features: {}ms", elapsed_seconds_PopSift.count() * 500.0f);
-
+        LOG_INFO("Nb SIFT features detected: {}", (keypoints1.size() + keypoints2.size())/2.0f);
         // Compute the matches between the keypoints of the first image and the keypoints of the second image
         matcher->match(descriptors1, descriptors2, matches);
+        endPopSift = std::chrono::system_clock::now();
+        elapsed_seconds_PopSift = endPopSift - startPopSift;
+        LOG_INFO("Time used by PopSift to detect, extract and match features: {}ms", elapsed_seconds_PopSift.count() * 1000.0f);
         LOG_INFO("{} matches found", matches.size());
         // Draw the matches in a dedicated image
         overlay->draw(image1, image2, viewerImage, keypoints1, keypoints2, matches);
