@@ -128,8 +128,13 @@ xpcf::XPCFErrorCode SolARDescriptorsExtractorFromImagePopSift::onConfigured()
 FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
                            const SRef<datastructure::Image> image,
                            std::vector<datastructure::Keypoint> & keypoints,
-                           SRef<SolAR::datastructure::DescriptorBuffer> & descriptors ) {
-
+                           SRef<SolAR::datastructure::DescriptorBuffer> & descriptors ) 
+{
+	// check grey image
+	if (image->getImageLayout() != Image::ImageLayout::LAYOUT_GREY) {
+		LOG_ERROR("Must convert image to grey image");
+		return FrameworkReturnCode::_ERROR_;
+	}
     LOG_DEBUG("SolARDescriptorsExtractorFromImagePopSift::extract Begin");
     if (image->getDataType() == Image::DataType::TYPE_32U  && m_imageMode != "Float")
     {
