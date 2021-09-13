@@ -43,7 +43,7 @@ namespace POPSIFT {
 
 /**
  * @class SolARDescriptorsExtractorFromImagePopSift
- * @brief <B>find the matches between keypoints of two input images.</B>
+ * @brief <B>Detect keypoints and compute the descriptors from an image.</B>
  * <TT>UUID: 7fb2aace-a1b1-11eb-bcbc-0242ac130002</TT>
  *
  */
@@ -59,20 +59,18 @@ public:
 
     org::bcom::xpcf::XPCFErrorCode onConfigured() override final;
 
-    ///
     /// @brief getType
     /// @return a string describing the type of descriptor used during extraction.
-    ///
     std::string getTypeString() override { return std::string("DescriptorsExtractorType::SIFT"); }
 
-    /// @brief match keypoints between two input images.
-    /// @param[in] image, image on which the keypoint and their descriptor will be detected and extracted.
-    /// @param[out] keypoints, The keypoints detected in the input image.
-    /// @param[out] descriptors, The descriptors of keypoint of the input image.
+    /// @brief detect keypoints and compute the descriptors.
+    /// @param[in] image image on which the keypoint and their descriptor will be detected and extracted.
+    /// @param[out] keypoints The keypoints detected in the input image.
+    /// @param[out] descriptors The descriptors of keypoints of the input image.
     /// @return FrameworkReturnCode::_SUCCESS_ if images are well matched, else FrameworkReturnCode::_ERROR
-    FrameworkReturnCode extract (const SRef<SolAR::datastructure::Image> image,
-                                         std::vector<SolAR::datastructure::Keypoint> &keypoints,
-                                         SRef<SolAR::datastructure::DescriptorBuffer> & descriptors) override;
+    FrameworkReturnCode extract(const SRef<SolAR::datastructure::Image> image,
+                                std::vector<SolAR::datastructure::Keypoint> &keypoints,
+                                SRef<SolAR::datastructure::DescriptorBuffer> & descriptors) override;
 
     void unloadComponent () override final;
 
