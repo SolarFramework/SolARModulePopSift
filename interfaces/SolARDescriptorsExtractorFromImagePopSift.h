@@ -32,6 +32,7 @@
 #define SolARDescriptorsExtractorFromImagePopSift_H
 #include <vector>
 #include "api/features/IDescriptorsExtractorFromImage.h"
+#include "api/image/IImageConvertor.h"
 #include "SolARPopSiftAPI.h"
 #include "xpcf/component/ConfigurableBase.h"
 
@@ -46,6 +47,9 @@ namespace POPSIFT {
  * @brief <B>Detect keypoints and compute the descriptors from an image.</B>
  * <TT>UUID: 7fb2aace-a1b1-11eb-bcbc-0242ac130002</TT>
  *
+ * @SolARComponentInjectablesBegin
+ * @SolARComponentInjectable{SolAR::api::image::IImageConvertor}
+ * @SolARComponentInjectablesEnd
  */
 
 class SOLARMODULEPOPSIFT_EXPORT_API SolARDescriptorsExtractorFromImagePopSift : public org::bcom::xpcf::ConfigurableBase,
@@ -75,6 +79,7 @@ public:
     void unloadComponent () override final;
 
 private:
+    SRef<SolAR::api::image::IImageConvertor> m_imageConvertor;
     PopSift* m_popSift;
     popsift::Config config;
 

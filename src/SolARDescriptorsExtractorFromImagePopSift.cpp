@@ -36,6 +36,7 @@ namespace POPSIFT {
 SolARDescriptorsExtractorFromImagePopSift::SolARDescriptorsExtractorFromImagePopSift():ConfigurableBase(xpcf::toUUID<SolARDescriptorsExtractorFromImagePopSift>())
 {
     addInterface<api::features::IDescriptorsExtractorFromImage>(this);
+    declareInjectable<SolAR::api::image::IImageConvertor>(m_imageConvertor);
     declareProperty("mode",m_mode);
     declareProperty("imageMode", m_imageMode);
     declareProperty("nbOctaves",m_nbOctaves);
@@ -130,18 +131,19 @@ FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
                            std::vector<datastructure::Keypoint> & keypoints,
                            SRef<SolAR::datastructure::DescriptorBuffer> & descriptors ) 
 {
-	// check grey image
-	if (image->getImageLayout() != Image::ImageLayout::LAYOUT_GREY) {
-		LOG_ERROR("Must convert image to grey image");
-		return FrameworkReturnCode::_ERROR_;
-	}
+    SRef<Image> greyImage;
+    // Convert Image from RGB to grey
+    if (image->getNbChannels() != 1)
+        m_imageConvertor->convert(image, greyImage, Image::ImageLayout::LAYOUT_GREY);
+    else
+        greyImage = image->copy();
     LOG_DEBUG("SolARDescriptorsExtractorFromImagePopSift::extract Begin");
-    if (image->getDataType() == Image::DataType::TYPE_32U  && m_imageMode != "Float")
+    if (greyImage->getDataType() == Image::DataType::TYPE_32U  && m_imageMode != "Float")
     {
         LOG_ERROR("Image format on 32 bits per component, imageMode of PopSift Descriptor extractor should be set to Float");
         return FrameworkReturnCode::_ERROR_;
     }
-    else if (image->getDataType() == Image::DataType::TYPE_8U  && m_imageMode != "Unsigned Char")
+    else if (greyImage->getDataType() == Image::DataType::TYPE_8U  && m_imageMode != "Unsigned Char")
     {
         LOG_ERROR("Image format on 8 bits per component, imageMode of PopSift Descriptor extractor should be set to Unsigned Char");
         return FrameworkReturnCode::_ERROR_;
@@ -153,9 +155,9 @@ FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
 
     SiftJob* job;
     if (m_imageMode == "Unsigned Char")
-        job = m_popSift->enqueue(image->getWidth(), image->getHeight(), (unsigned char*)image->data());
+        job = m_popSift->enqueue(image->getWidth(), image->getHeight(), (unsigned char*)greyImage->data());
     else if (m_imageMode == "Float")
-        job = m_popSift->enqueue(image->getWidth(), image->getHeight(), (float*)image->data());
+        job = m_popSift->enqueue(image->getWidth(), image->getHeight(), (float*)greyImage->data());
     else
         return FrameworkReturnCode::_ERROR_;
 
