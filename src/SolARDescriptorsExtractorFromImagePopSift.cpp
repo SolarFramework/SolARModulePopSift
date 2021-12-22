@@ -194,6 +194,10 @@ FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
 		descBuffer.push_back(descPtr[descPos]);
 		descPos += popFeat.num_ori;	
     }
+	if (keypoints.size() == 0) {
+		LOG_WARNING("No keypoints detected");
+		return FrameworkReturnCode::_ERROR_;
+	}
     descriptors.reset( new DescriptorBuffer((unsigned char*)descBuffer.data(), DescriptorType::SIFT, DescriptorDataType::TYPE_32F, 128, keypoints.size())) ;	
 	descriptors = xpcf::utils::make_shared<DescriptorBuffer>((unsigned char*)descriptors->convertTo(DescriptorDataType::TYPE_8U).data(), DescriptorType::SIFT_UINT8, keypoints.size());
 	LOG_DEBUG("{} keypoints were detected by PopSift", descriptors->getNbDescriptors());
