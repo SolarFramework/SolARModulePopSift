@@ -65,7 +65,7 @@ public:
 
     /// @brief getType
     /// @return a string describing the type of descriptor used during extraction.
-    std::string getTypeString() override { return std::string("DescriptorsExtractorType::SIFT"); }
+    std::string getTypeString() override { return std::string("DescriptorsExtractorType::SIFT_UINT8"); }
 
     /// @brief detect keypoints and compute the descriptors.
     /// @param[in] image image on which the keypoint and their descriptor will be detected and extracted.
