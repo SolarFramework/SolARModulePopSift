@@ -40,6 +40,12 @@
 
 namespace SolAR {
 namespace MODULES {
+/**
+ * @namespace SolAR::MODULES::POPSIFT
+ * @brief <B>Provides a CUDA optimized SIFT feature detection and extraction based on PopSift library: https://github.com/alicevision/popsift</B>
+ * <TT>UUID: 4a43732c-a1b2-11eb-bcbc-0242ac130002</TT>
+ *
+ */
 namespace POPSIFT {
 
 /**
