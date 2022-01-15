@@ -46,8 +46,9 @@ include (SolARModulePopSift.pri)
 unix {
     INCLUDEPATH+= /usr/local/cuda/include
     QMAKE_CXXFLAGS += -Wignored-qualifiers
-#    QMAKE_CXX = clang++
-#    QMAKE_LINK = clang++
+
+    # Avoids adding install steps manually. To be commented to have a better control over them.
+    QMAKE_POST_LINK += "make install install_deps"
 }
 
 macx {
