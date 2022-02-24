@@ -97,7 +97,10 @@ int main()
             LOG_WARNING("First image {} cannot be loaded", imageLoaderImage1->bindTo<xpcf::IConfigurable>()->getProperty("filePath")->getStringValue());
             return 0;
         }
-        imageConvertor->convert(image1, greyImage1, SolAR::datastructure::Image::ImageLayout::LAYOUT_GREY);
+		if (image1->getNbChannels() != 1)
+			imageConvertor->convert(image1, greyImage1, SolAR::datastructure::Image::ImageLayout::LAYOUT_GREY);
+		else
+			greyImage1 = image1;
 
         // Get the second image (the path of this image is defined in the conf_DetectorMatcher.xml)
         if (imageLoaderImage2->getImage(image2) != FrameworkReturnCode::_SUCCESS)
@@ -105,7 +108,10 @@ int main()
             LOG_WARNING("Second image {} cannot be loaded", imageLoaderImage2->bindTo<xpcf::IConfigurable>()->getProperty("filePath")->getStringValue());
             return 0;
         }
-        imageConvertor->convert(image2, greyImage2, SolAR::datastructure::Image::ImageLayout::LAYOUT_GREY);
+		if (image2->getNbChannels() != 1)
+			imageConvertor->convert(image2, greyImage2, SolAR::datastructure::Image::ImageLayout::LAYOUT_GREY);
+		else
+			greyImage2 = image2;
 
         std::chrono::time_point<std::chrono::system_clock> startPopSift, endPopSift;
         startPopSift = std::chrono::system_clock::now();
