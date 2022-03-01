@@ -162,29 +162,45 @@ FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
         return FrameworkReturnCode::_ERROR_;
 
     popsift::FeaturesHost* popFeatures = job->getHost();
-
-      int id=0;
+    int id(0);	
+	std::vector<popsift::Descriptor> descBuffer;
+	int descPos(0);
+	popsift::Descriptor* descPtr = popFeatures->getDescriptors();
+	// Extract the best feature for each position
     for(const auto& popFeat: *popFeatures)
     {
-        for(int orientationIndex = 0; orientationIndex < popFeat.num_ori; ++orientationIndex)
-        {
-          Keypoint kp;
-          kp.init(id++,
-                  popFeat.xpos,
-                  popFeat.ypos,
-                  0.0f,  //(float)image->data()[pixelPos],
-                  0.0f, //(float)image->data()[pixelPos+nbCompPerPixel],
-                  0.0f, //(float)image->data()[pixelPos+(2*nbCompPerPixel)],
-                  popFeat.sigma,
-                  popFeat.orientation[orientationIndex]);
-
-          keypoints.push_back(kp);
-        }
+		// position
+		float x = popFeat.xpos;
+		float y = popFeat.ypos;
+		// extract pixel value
+		Vector3b pixelValue;
+		if (image->getNbChannels() == 3)
+			pixelValue = image->getPixel<Vector3b>((int)y, (int)x);
+		else {
+			uint8_t value = image->getPixel<uint8_t>((int)y, (int)x);
+			pixelValue = Vector3b(value, value, value);
+		}
+		// keypoint
+		Keypoint kp(id++,
+					x,
+					y,
+					pixelValue[2],
+					pixelValue[1],
+					pixelValue[0],
+					popFeat.sigma,
+					popFeat.orientation[0]);
+		keypoints.push_back(kp);		
+		// descriptor
+		descBuffer.push_back(descPtr[descPos]);
+		descPos += popFeat.num_ori;	
     }
-    descriptors.reset( new DescriptorBuffer((unsigned char*)popFeatures->getDescriptors(), DescriptorType::SIFT, DescriptorDataType::TYPE_32F, 128, popFeatures->getDescriptorCount())) ;
-
-    LOG_DEBUG("{} keypoints were detected by PopSift", id-1);
-
+	if (keypoints.size() == 0) {
+		LOG_WARNING("No keypoints detected");
+		return FrameworkReturnCode::_ERROR_;
+	}
+    descriptors.reset( new DescriptorBuffer((unsigned char*)descBuffer.data(), DescriptorType::SIFT, DescriptorDataType::TYPE_32F, 128, keypoints.size())) ;	
+    descriptors = xpcf::utils::make_shared<DescriptorBuffer>((unsigned char*)descriptors->convertTo(DescriptorDataType::TYPE_8U).data(), DescriptorType::SIFT_UINT8, keypoints.size());
+	LOG_DEBUG("{} keypoints were detected by PopSift", descriptors->getNbDescriptors());
     return FrameworkReturnCode::_SUCCESS;
 }
 

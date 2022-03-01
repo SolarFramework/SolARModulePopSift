@@ -17,7 +17,6 @@
 #include "xpcf/xpcf.h"
 
 #include "api/image/IImageLoader.h"
-#include "api/image/IImageConvertor.h"
 #include "api/features/IDescriptorsExtractorFromImage.h"
 #include "api/features/IImageMatcher.h"
 #include "api/display/IImageViewer.h"
@@ -60,9 +59,6 @@ int main()
 
         SRef<image::IImageLoader> imageLoaderImage1 = xpcfComponentManager->resolve<image::IImageLoader>("image1");
         SRef<image::IImageLoader> imageLoaderImage2 = xpcfComponentManager->resolve<image::IImageLoader>("image2");
-
-        SRef<image::IImageConvertor> imageConvertor = xpcfComponentManager->resolve<image::IImageConvertor>();
-
         SRef<features::IDescriptorsExtractorFromImage> extractor = xpcfComponentManager->resolve<features::IDescriptorsExtractorFromImage>();
 
         SRef<features::IImageMatcher> imageMatcher = xpcfComponentManager->resolve<features::IImageMatcher>();
@@ -81,8 +77,8 @@ int main()
             return -1;
         }
 
-        SRef<Image>                     image1, greyImage1;
-        SRef<Image>                     image2, greyImage2;
+        SRef<Image>                     image1;
+        SRef<Image>                     image2;
         std::vector<Keypoint>           keypoints1, keypoints1ImageMatcher;
         std::vector<Keypoint>           keypoints2, keypoints2ImageMatcher;
         SRef<DescriptorBuffer>          descriptors1, descriptors1ImageMatcher;
@@ -97,10 +93,6 @@ int main()
             LOG_WARNING("First image {} cannot be loaded", imageLoaderImage1->bindTo<xpcf::IConfigurable>()->getProperty("filePath")->getStringValue());
             return 0;
         }
-		if (image1->getNbChannels() != 1)
-			imageConvertor->convert(image1, greyImage1, SolAR::datastructure::Image::ImageLayout::LAYOUT_GREY);
-		else
-			greyImage1 = image1;
 
         // Get the second image (the path of this image is defined in the conf_DetectorMatcher.xml)
         if (imageLoaderImage2->getImage(image2) != FrameworkReturnCode::_SUCCESS)
@@ -108,20 +100,16 @@ int main()
             LOG_WARNING("Second image {} cannot be loaded", imageLoaderImage2->bindTo<xpcf::IConfigurable>()->getProperty("filePath")->getStringValue());
             return 0;
         }
-		if (image2->getNbChannels() != 1)
-			imageConvertor->convert(image2, greyImage2, SolAR::datastructure::Image::ImageLayout::LAYOUT_GREY);
-		else
-			greyImage2 = image2;
 
         std::chrono::time_point<std::chrono::system_clock> startPopSift, endPopSift;
         startPopSift = std::chrono::system_clock::now();
         // POPSIFT
         // --------
         // Extract the SIFT keypoints and descriptors from the first image
-        extractor->extract(greyImage1, keypoints1, descriptors1);
-
+        extractor->extract(image1, keypoints1, descriptors1);
+		
         // Extract the SIFT keypoints and descriptors from from the first image
-        extractor->extract(greyImage2, keypoints2, descriptors2);
+        extractor->extract(image2, keypoints2, descriptors2);
 
         endPopSift = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds_PopSift = endPopSift - startPopSift;
