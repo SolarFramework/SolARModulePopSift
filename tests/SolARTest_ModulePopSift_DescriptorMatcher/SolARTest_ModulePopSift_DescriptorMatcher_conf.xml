@@ -37,7 +37,7 @@
         <bindings>
             <bind interface="IImageLoader" to="SolARImageLoaderOpencv" name="image1" properties="image1_prop"/>
             <bind interface="IImageLoader" to="SolARImageLoaderOpencv" name="image2" properties="image2_prop"/>
-            <bind interface="IImageViewer" to="SolARImageViewerOpencv" name="default" properties="default"/>
+            <bind interface="IImageViewer" to="SolARImageViewerOpencv"/>
             <bind interface="IImageViewer" to="SolARImageViewerOpencv" name="imageMatcher" properties="imageMatcher"/>
         </bindings>
     </factory>
@@ -57,9 +57,9 @@
             <property name="sigma" type="float" value="1.0"/>
             <property name="threshold" type="float" value="0.005"/>
             <property name="edgeLimit" type="float" value="10.0"/>
-            <property name="downsampling" type="float" value="1.0"/>
+            <property name="downsampling" type="float" value="-1.0"/>
             <property name="initialBlur" type="float" value="-1.0"/>
-            <property name="maxTotalKeypoints" type="uint" value="10000"/>
+            <property name="maxTotalKeypoints" type="uint" value="1000"/>
         </configure>
         <configure component="SolARImageMatcherPopSift">
             <property name="mode" type="string" value="PopSift"/>
@@ -69,9 +69,9 @@
             <property name="sigma" type="float" value="1.0"/>
             <property name="threshold" type="float" value="0.005"/>
             <property name="edgeLimit" type="float" value="10.0"/>
-            <property name="downsampling" type="float" value="1.0"/>
+            <property name="downsampling" type="float" value="-1.0"/>
             <property name="initialBlur" type="float" value="-1.0"/>
-            <property name="maxTotalKeypoints" type="uint" value="10000"/>
+            <property name="maxTotalKeypoints" type="uint" value="1000"/>
         </configure>
         <configure component="SolARMatchesOverlayOpencv">
             <property name="thickness" type="uint" value="1"/>
@@ -83,7 +83,7 @@
             </property>
             <property name="maxMatches" type="int" value="-1"/>
         </configure>
-        <configure component="SolARImageViewerOpencv" name="default">
+        <configure component="SolARImageViewerOpencv">
             <property name="title" type="string" value="Matches PopSift (press esc key to exit)"/>
             <property name="exitKey" type="int" value="27"/>
             <property name="width" type="int" value="0"/>
