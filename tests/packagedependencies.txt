@@ -1,2 +1,0 @@
-SolARModulePopSift|0.11.0|SolARModulePopSift|SolARBuild@github|https://github.com/SolarFramework/SolARModulePopSift/releases/download
-SolARModuleOpenCV|0.11.0|SolARModuleOpenCV|SolARBuild@github|https://github.com/SolarFramework/SolarModuleOpenCV/releases/download
