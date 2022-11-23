@@ -115,12 +115,9 @@ private:
 }
 }
 
-template <> struct org::bcom::xpcf::ComponentTraits<SolAR::MODULES::POPSIFT::SolARImageMatcherPopSift>
-{
-
-    static constexpr const char * UUID = "{3baab95a-ad25-11eb-8529-0242ac130003}";
-    static constexpr const char * NAME = "SolARImageMatcherPopSift";
-    static constexpr const char * DESCRIPTION = "SolARImageMatcherPopSift implements SolAR::api::features::IImageMAtcher interface";
-};
+XPCF_DEFINE_COMPONENT_TRAITS(SolAR::MODULES::POPSIFT::SolARImageMatcherPopSift,
+                             "3baab95a-ad25-11eb-8529-0242ac130003",
+                             "SolARImageMatcherPopSift",
+                             "SolARImageMatcherPopSift implements SolAR::api::features::IImageMAtcher interface")
 
 #endif // SolARImageMatcherPopSift_H
