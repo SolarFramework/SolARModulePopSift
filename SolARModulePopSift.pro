@@ -68,6 +68,8 @@ win32 {
     QMAKE_CXXFLAGS += -wd4250 -wd4251 -wd4244 -wd4275
     QMAKE_CXXFLAGS_RELEASE += /O2
     QMAKE_CXXFLAGS_DEBUG += /Od
+    LIBS += -L$$(CUDA_PATH)/lib/x64
+    LIBS += -lcudart -lcudadevrt
 }
 
 header_files.path = $${PROJECTDEPLOYDIR}/interfaces
