@@ -23,6 +23,7 @@
 #include <popsift/sift_conf.h>
 #include <popsift/sift_config.h>
 #include <popsift/version.hpp>
+#include <memory>
 
 XPCF_DEFINE_FACTORY_CREATE_INSTANCE(SolAR::MODULES::POPSIFT::SolARDescriptorsExtractorFromImagePopSift);
 
@@ -153,15 +154,15 @@ FrameworkReturnCode SolARDescriptorsExtractorFromImagePopSift::extract(
     if (allocTestError!=PopSift::AllocTest::Ok)
         LOG_ERROR("{}",m_popSift->testTextureFitErrorString(allocTestError,image->getWidth(), image->getHeight()));
 
-    SiftJob* job;
+    std::unique_ptr<SiftJob> job;
     if (m_imageMode == "Unsigned Char")
-        job = m_popSift->enqueue(image->getWidth(), image->getHeight(), (unsigned char*)greyImage->data());
+        job.reset(m_popSift->enqueue(image->getWidth(), image->getHeight(), (unsigned char*)greyImage->data()));
     else if (m_imageMode == "Float")
-        job = m_popSift->enqueue(image->getWidth(), image->getHeight(), (float*)greyImage->data());
+        job.reset(m_popSift->enqueue(image->getWidth(), image->getHeight(), (float*)greyImage->data()));
     else
         return FrameworkReturnCode::_ERROR_;
 
-    popsift::FeaturesHost* popFeatures = job->getHost();
+    std::unique_ptr<popsift::Features> popFeatures(job->get());
     int id(0);	
 	std::vector<popsift::Descriptor> descBuffer;
 	int descPos(0);
