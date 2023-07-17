@@ -1,2 +1,2 @@
-SolARFramework|0.11.0|SolARFramework|SolARBuild@github|https://github.com/SolarFramework/SolarFramework/releases/download
-popsift|1.0.0-rc3|popsift|conan-solar@conan|conan-solar#https://artifact.b-com.com/api/conan/solar-conan-local#0|default
+SolARFramework|1.0.0|SolARFramework|SolARBuild@github|https://github.com/SolarFramework/SolarFramework/releases/download
+popsift#1_0_0|1.0.0-rc3|popsift|conan-solar@conan|conan-solar|default

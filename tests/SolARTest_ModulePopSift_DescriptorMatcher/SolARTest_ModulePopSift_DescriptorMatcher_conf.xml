@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <xpcf-registry autoAlias="true">
-    <module uuid="4a43732c-a1b2-11eb-bcbc-0242ac130002" name="SolARModulePopSift" description="SolARModulePopSift" path="$XPCF_MODULE_ROOT/SolARBuild/SolARModulePopSift/0.11.0/lib/x86_64/shared">
+    <module uuid="4a43732c-a1b2-11eb-bcbc-0242ac130002" name="SolARModulePopSift" description="SolARModulePopSift" path="$XPCF_MODULE_ROOT/SolARBuild/SolARModulePopSift/1.0.0/lib/x86_64/shared">
         <component uuid="7fb2aace-a1b1-11eb-bcbc-0242ac130002" name="SolARDescritorsExtractorFromImagePopSift" description="SolARDescritorsExtractorFromImagePopSift">
             <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
             <interface uuid="1cd4f5f1-6b74-413b-9725-69653aee48ef" name="IDescriptorsExtractorFromImage" description="IDescriptorsExtractorFromImage"/>
@@ -10,7 +10,7 @@
             <interface uuid="157ec340-0682-4e6c-bf69-e4d95fa760d3" name="IImageMatcher" description="IImageMatcher"/>
         </component>
     </module>
-    <module uuid="15e1990b-86b2-445c-8194-0cbe80ede970" name="SolARModuleOpenCV" description="SolARModuleOpenCV" path="$XPCF_MODULE_ROOT/SolARBuild/SolARModuleOpenCV/0.11.0/lib/x86_64/shared">
+    <module uuid="15e1990b-86b2-445c-8194-0cbe80ede970" name="SolARModuleOpenCV" description="SolARModuleOpenCV" path="$XPCF_MODULE_ROOT/SolARBuild/SolARModuleOpenCV/1.0.0/lib/x86_64/shared">
         <component uuid="e42d6526-9eb1-4f8a-bb68-53e06f09609c" name="SolARImageLoaderOpencv" description="SolARImageLoaderOpencv">
                 <interface uuid="125f2007-1bf9-421d-9367-fbdc1210d006" name="IComponentIntrospect" description="IComponentIntrospect"/>
                 <interface uuid="6FCDAA8D-6EA9-4C3F-97B0-46CD11B67A9B" name="IImageLoader" description="IImageLoader"/>
